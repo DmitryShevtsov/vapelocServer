@@ -19,8 +19,9 @@ router.put('/vapeshops/:id', function (req, res) {
   Vapeshops.findById(req.params.id).then((vapeshop) => {
     vapeshop.updateAttributes({name: req.body.name, description: req.body.description, lat: req.body.lat, lng: req.body.lng,
     avatar: req.body.avatar, background: req.body.background});
-    res.status(202);
-  })
+  }).then((vapeshop) => {
+    res.json(vapeshop);
+  });
 });
 
 router.delete('/vapeshops/:id', function (req, res) {
@@ -28,20 +29,30 @@ router.delete('/vapeshops/:id', function (req, res) {
     where: {
       id: req.params.id
     }
+  }).then(() => {
+    res.json("Vapeshop deleted");
   });
-  res.status(202);
 });
 
 router.post('/vapeshops', function (req, res) {
-  Vapeshops.create({
+  if (req.body.name && req.body.description) /* ADD LAT LNG CHECKER*/
+  {
+    if (req.body.lat&&req.body.lng&&req.body.lat&&req.body.lng)
+    Vapeshops.create({
     name: req.body.name,
     description: req.body.description,
     lat: req.body.lat,
     lng: req.body.lng,
     background: req.body.background,
-    avatar: req.body.avatar
-  });
-  res.status(201);
+    avatar: req.body.avatar,
+    user_id: req.body.user_id
+  }).then((vapeshop) => {
+    res.status(201).json(vapeshop);
+  });}
+  else {
+    res.json({message: 'fields cant be empty'});
+  }
+
 });
 
 module.exports = router;
